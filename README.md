@@ -1,0 +1,464 @@
+# SOPHiA VCF Downloader
+
+Bu otomasyon, SOPHiA CLI wrapper kullanarak hesaplardan `full_variant_table.vcf` dosyalarını indirir ve her run için sample metadata Excel dosyası oluşturur.
+
+Kısaca yaptığı iş:
+
+1. Excel dosyasından indirilecek hesapları okur.
+2. Her hesap için SOPHiA hesabına giriş yapar.
+3. `status --limit` ile run ID listesini alır.
+4. Her run için sample metadata bilgisini kaydeder.
+5. Run dosyalarını listeler.
+6. Sadece `full_variant_table.vcf` dosyalarını indirir.
+7. İndirilen dosyaları kurum ve run bazlı klasörlere yerleştirir.
+8. İşlem yarıda kesilirse kaldığı yerden devam edebilir.
+
+## Input
+
+Multi-client modda input bir Excel dosyasıdır.
+
+Varsayılan kolonlar:
+
+| Kolon | İçerik |
+|---|---|
+| 1 | `client_id` |
+| 2 | kurum / hesap adı |
+| 4 | `checked` bilgisi |
+
+Sadece 4. kolonda tam olarak `checked` yazan satırlar işlenir.
+
+Örnek:
+
+```text
+client_id | institution_name | ... | checked
+203441    | Example Hospital  | ... | checked
+20099     | Another Hospital  | ... | checked
+21038     | Skipped Hospital  | ... |
+```
+
+Single-client modda Excel gerekmez. Script mevcut SOPHiA oturumundaki hesabı kullanır.
+
+## Output
+
+Varsayılan olarak çıktılar script'i çalıştırdığınız klasörün altında oluşur.
+
+Multi-client çıktı yapısı:
+
+```text
+.
+|-- accounts_manifest.tsv
+|-- Institution Name 1
+|   |-- run_ids.tsv
+|   |-- download_manifest.tsv
+|   |-- 34836
+|   |   |-- SAMPLE1_full_variant_table.vcf
+|   |   `-- sample_metadata.xlsx
+|   `-- 34837
+|       |-- SAMPLE2_full_variant_table.vcf
+|       `-- sample_metadata.xlsx
+`-- Institution Name 2
+    |-- run_ids.tsv
+    |-- download_manifest.tsv
+    `-- ...
+```
+
+Single-client çıktı yapısı:
+
+```text
+.
+`-- 203441
+    |-- run_ids.tsv
+    |-- download_manifest.tsv
+    `-- <run_id>
+        |-- <userRef>_full_variant_table.vcf
+        `-- sample_metadata.xlsx
+```
+
+Kurum adları ve `userRef` değerleri dosya sistemi için güvenli hale getirilir. Türkçe karakterler ASCII karşılıklarına çevrilir.
+
+Örnek:
+
+```text
+İstanbul Üniversitesi -> Istanbul Universitesi
+```
+
+## Oluşan Dosyalar
+
+`run_ids.tsv`
+
+Her kurum için alınan run listesini tutar.
+
+Kolonlar:
+
+```text
+run_id
+status
+```
+
+`download_manifest.tsv`
+
+Her kurum için run ve download durumunu tutar.
+
+Kolonlar:
+
+```text
+run_id
+file_id
+userRef
+analysisId
+output_path
+status
+metadata_status
+metadata_path
+metadata_error
+error
+```
+
+`sample_metadata.xlsx`
+
+Her run klasöründe oluşur.
+
+Kolonlar:
+
+```text
+userRef
+analysisType
+genePanel
+processDate
+Date
+```
+
+`Date`, `processDate` değerinin `DD-MM-YYYY` formatına çevrilmiş halidir.
+
+`accounts_manifest.tsv`
+
+Multi-client çalışmada hesap bazlı genel sonucu tutar.
+
+## Kullanılan SOPHiA CLI Komutları
+
+Script, arka planda şu SOPHiA wrapper komutlarını çalıştırır:
+
+```bash
+python3 sg-upload-v2-wrapper.py login-iam --client-id <CLIENT_ID>
+```
+
+Multi-client modda her hesap için aktif hesaba giriş yapmak için kullanılır.
+
+```bash
+python3 sg-upload-v2-wrapper.py status --limit <N>
+```
+
+Run ID listesini almak için kullanılır.
+
+```bash
+python3 sg-upload-v2-wrapper.py sample --run-id <RUN_ID>
+```
+
+Run içindeki sample metadata bilgisini almak için kullanılır.
+
+```bash
+python3 sg-upload-v2-wrapper.py file --list --run-id <RUN_ID>
+```
+
+Run içindeki dosyaları listelemek için kullanılır.
+
+```bash
+python3 sg-upload-v2-wrapper.py file --download --file-id <FILE_ID> --file-out <OUTPUT_PATH>
+```
+
+Seçilen VCF dosyasını indirmek için kullanılır.
+
+## VCF Seçimi ve İsimlendirme
+
+Script sadece şu dosyaları indirir:
+
+```text
+full_variant_table.vcf
+```
+
+Dosya seçimi şu alanlara bakılarak yapılır:
+
+```text
+filename == "full_variant_table.vcf"
+```
+
+veya fallback olarak:
+
+```text
+name == "full_variant_table.vcf"
+```
+
+İndirilen VCF adı şu formatta olur:
+
+```text
+<userRef>_full_variant_table.vcf
+```
+
+Eğer `userRef` yoksa dosya kaybolmasın diye şu format kullanılır:
+
+```text
+unknown_<RUN_ID>_full_variant_table.vcf
+```
+
+Aynı run içinde aynı isim çakışırsa dosya adına `analysisId` veya `fileId` eklenir.
+
+## Requirements
+
+Gerekli olanlar:
+
+- Linux veya WSL
+- Python 3.10+
+- SOPHiA wrapper dosyası: `sg-upload-v2-wrapper.py`
+- SOPHiA CLI için geçerli oturum / erişim
+- Multi-client kullanım için `.xlsx` hesap dosyası
+
+Ek bir pip paketi gerekmez. Script Excel okuma/yazma işlemlerini Python standart kütüphanesiyle yapar.
+
+## Çalıştırma
+
+Script ve SOPHiA wrapper aynı klasördeyse:
+
+```bash
+python3 download_sophia_vcfss.py --accounts-xlsx ./sophia_accounts.xlsx
+```
+
+Worker sayısını belirlemek için:
+
+```bash
+python3 download_sophia_vcfss.py --accounts-xlsx ./sophia_accounts.xlsx --workers 4
+```
+
+Küçük test çalışması için:
+
+```bash
+python3 download_sophia_vcfss.py --accounts-xlsx ./sophia_accounts.xlsx --max-accounts 2 --limit 5 --dry-run
+```
+
+Single-client çalıştırmak için:
+
+```bash
+python3 download_sophia_vcfss.py --client-folder 203441
+```
+
+Single-client modda script `login-iam` çalıştırmaz. Mevcut aktif SOPHiA hesabı üzerinden ilerler.
+
+## Flagler
+
+`--accounts-xlsx`
+
+Multi-client hesap Excel dosyasının yolu.
+
+```bash
+--accounts-xlsx ./sophia_accounts.xlsx
+```
+
+`--workers`
+
+Aynı anda kaç run işleneceğini belirler. Varsayılan değer `4`.
+
+```bash
+--workers 4
+```
+
+Bir worker bir run üzerinde çalışır. O run için metadata alır, file list yapar ve gerekiyorsa VCF indirir. Aynı anda maksimum download sayısı da doğal olarak worker sayısı kadardır.
+
+`--limit`
+
+`status --limit` için kullanılacak run sayısı. Varsayılan değer `10000`.
+
+```bash
+--limit 10000
+```
+
+`--output-root`
+
+Çıktıların yazılacağı ana klasör. Varsayılan değer mevcut klasör.
+
+```bash
+--output-root ./downloads
+```
+
+`--client-id-col`, `--name-col`, `--checked-col`
+
+Excel kolonlarını değiştirmek için kullanılır. Kolon numaraları 1'den başlar.
+
+```bash
+--client-id-col 1 --name-col 2 --checked-col 4
+```
+
+`--dry-run`
+
+Status, sample ve file list adımlarını çalıştırır; TSV/XLSX dosyalarını oluşturur ama VCF indirmez.
+
+```bash
+--dry-run
+```
+
+`--force`
+
+Mevcut VCF dosyaları doğru boyutta görünse bile yeniden indirir.
+
+```bash
+--force
+```
+
+`--force-metadata`
+
+Mevcut `sample_metadata.xlsx` dosyalarını yeniden oluşturur.
+
+```bash
+--force-metadata
+```
+
+`--resume-from-latest-manifest`
+
+Multi-client modda en son güncellenmiş `download_manifest.tsv` hangi kurumdaysa oradan devam eder. Daha önce bitmiş kurumları tekrar taramaz.
+
+```bash
+--resume-from-latest-manifest
+```
+
+`--resume-verify-last-runs`
+
+Resume sırasında aktif kurumun manifestindeki son kaç run'ın yeniden kontrol edileceğini belirler. Varsayılan değer `10`.
+
+```bash
+--resume-verify-last-runs 10
+```
+
+`--no-resume`
+
+Manifest'e göre atlama yapmaz. Run'ları tekrar işler.
+
+```bash
+--no-resume
+```
+
+`--verbose`
+
+Her run için daha detaylı terminal çıktısı verir.
+
+```bash
+--verbose
+```
+
+`--command-timeout`
+
+`login-iam`, `status`, `sample`, `file --list` komutları için timeout süresi. Varsayılan değer `300` saniye.
+
+```bash
+--command-timeout 300
+```
+
+`--download-timeout`
+
+Tek bir VCF download komutu için toplam timeout süresi. Varsayılan değer `2700` saniye.
+
+```bash
+--download-timeout 2700
+```
+
+`--download-start-timeout`
+
+Download başladıktan sonra `.vcf.part` dosyası bu süre içinde oluşmazsa download başarısız kabul edilir. Varsayılan değer `180` saniye.
+
+```bash
+--download-start-timeout 180
+```
+
+`--download-stall-timeout`
+
+`.vcf.part` dosyasının boyutu bu süre boyunca artmazsa download takılmış kabul edilir. Varsayılan değer `300` saniye.
+
+```bash
+--download-stall-timeout 300
+```
+
+`--wrapper`
+
+SOPHiA wrapper dosyasının yolu. Varsayılan değer `./sg-upload-v2-wrapper.py`.
+
+```bash
+--wrapper ./sg-upload-v2-wrapper.py
+```
+
+`--python`
+
+Wrapper'ı çalıştırmak için kullanılacak Python komutu. Varsayılan değer `python3`.
+
+```bash
+--python python3
+```
+
+## Resume Yaklaşımı
+
+Script resume destekler. Yani terminal kapanırsa, bağlantı koparsa veya işlem elle durdurulursa tekrar başlatıldığında daha önce tamamlanan dosyaları tekrar indirmemeye çalışır.
+
+VCF için tamamlanma kontrolü:
+
+1. Final `.vcf` dosyası var mı?
+2. Dosya boyutu sıfırdan büyük mü?
+3. SOPHiA `file --list` çıktısındaki `contentLength` ile lokal dosya boyutu eşleşiyor mu?
+
+Bu kontroller geçerse download atlanır.
+
+Geçici download dosyaları `.vcf.part` uzantısıyla yazılır. Download başarılı olursa `.part` dosyası final `.vcf` adına taşınır. Böylece yarım inmiş dosya final VCF gibi görünmez.
+
+Metadata için tamamlanma kontrolü:
+
+```text
+sample_metadata.xlsx
+```
+
+dosyası varsa metadata adımı atlanır. Yeniden oluşturmak için `--force-metadata` kullanılabilir.
+
+## Kesilen İşe Devam Etme
+
+Multi-client çalışmada önerilen resume komutu:
+
+```bash
+python3 download_sophia_vcfss.py \
+  --accounts-xlsx ./sophia_accounts.xlsx \
+  --resume-from-latest-manifest \
+  --resume-verify-last-runs 10
+```
+
+Bu komut:
+
+1. En son güncellenmiş `download_manifest.tsv` dosyasını bulur.
+2. O manifest hangi kuruma aitse o kurumdan devam eder.
+3. Daha önceki kurumları tekrar taramaz.
+4. Aktif kurumda son 10 run'ı yeniden kontrol eder.
+5. Eksik, yarım veya boyutu uyuşmayan VCF varsa tekrar indirir.
+
+Eğer her şeyi baştan kontrol etmek isterseniz `--resume-from-latest-manifest` kullanmayın.
+
+## Terminalde Takip
+
+Script terminalde hesap ve run ilerlemesini gösterir.
+
+Örnek çıktı:
+
+```text
+[4/140] Example Hospital (client-id 20099): logging in
+[4/140] Example Hospital (client-id 20099): fetching latest 10000 runs
+[Example Hospital] Resume: skipping 120 runs, processing 35 active runs
+[Example Hospital] Processed 25/35 active runs
+[4/140] Example Hospital (client-id 20099): done downloaded=20, skipped_exists=15
+```
+
+Daha detaylı çıktı için:
+
+```bash
+--verbose
+```
+
+## Güvenli Durdurma
+
+Prosesi durdurmak için ana script prosesine `INT` sinyali gönderebilirsiniz:
+
+```bash
+pkill -INT -f 'download_sophia_vcfss.py'
+```
+
+Daha sonra resume komutuyla devam edebilirsiniz.

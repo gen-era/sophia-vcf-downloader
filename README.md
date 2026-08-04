@@ -2,7 +2,7 @@
 
 Bu otomasyon, SOPHiA CLI wrapper kullanarak hesaplardan `full_variant_table.vcf` dosyalarını indirir ve her run için sample metadata Excel dosyası oluşturur.
 
-Kısaca yaptığı iş:
+İş akışı:
 
 1. Excel dosyasından indirilecek hesapları okur.
 2. Her hesap için SOPHiA hesabına giriş yapar.

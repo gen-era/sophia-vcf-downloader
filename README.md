@@ -50,10 +50,10 @@ Multi-client çıktı yapısı:
 |-- Institution Name 1
 |   |-- run_ids.tsv
 |   |-- download_manifest.tsv
-|   |-- 34836
+|   |-- <RUN-ID-1>
 |   |   |-- SAMPLE1_full_variant_table.vcf
 |   |   `-- sample_metadata.xlsx
-|   `-- 34837
+|   `-- <RUN-ID-2>
 |       |-- SAMPLE2_full_variant_table.vcf
 |       `-- sample_metadata.xlsx
 `-- Institution Name 2
@@ -390,25 +390,13 @@ Script terminalde hesap ve run ilerlemesini gösterir.
 Örnek çıktı:
 
 ```text
-[4/140] Example Hospital (client-id 20099): logging in
-[4/140] Example Hospital (client-id 20099): fetching latest 10000 runs
+[4/140] Example Hospital (client-id 12345): logging in
+[4/140] Example Hospital (client-id 12345): fetching latest 10000 runs
 [Example Hospital] Resume: skipping 120 runs, processing 35 active runs
 [Example Hospital] Processed 25/35 active runs
-[4/140] Example Hospital (client-id 20099): done downloaded=20, skipped_exists=15
+[4/140] Example Hospital (client-id 12345): done downloaded=20, skipped_exists=15
 ```
 
 Daha detaylı çıktı için:
 
-```bash
---verbose
-```
 
-## Güvenli Durdurma
-
-Prosesi durdurmak için ana script prosesine `INT` sinyali gönderebilirsiniz:
-
-```bash
-pkill -INT -f 'download_sophia_vcfss.py'
-```
-
-Daha sonra resume komutuyla devam edebilirsiniz.

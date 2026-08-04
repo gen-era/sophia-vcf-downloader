@@ -244,131 +244,71 @@ Single-client modda script `login-iam` çalıştırmaz. Mevcut aktif SOPHiA hesa
 
 ## Flagler
 
-`--accounts-xlsx`
-
-Multi-client hesap Excel dosyasının yolu.
+`--accounts-xlsx`: Multi-client hesap Excel dosyasının yolu.
 
 ```bash
---accounts-xlsx ./sophia_accounts.xlsx
+--accounts-xlsx path/to/sophia_accounts.xlsx
 ```
 
-`--workers`
-
-Aynı anda kaç run işleneceğini belirler. Varsayılan değer `4`.
+`--workers`: Aynı anda kaç run işleneceğini belirler. Varsayılan değer `4`.
 
 ```bash
 --workers 4
 ```
 
-Bir worker bir run üzerinde çalışır. O run için metadata alır, file list yapar ve gerekiyorsa VCF indirir. Aynı anda maksimum download sayısı da doğal olarak worker sayısı kadardır.
-
-`--limit`
-
-`status --limit` için kullanılacak run sayısı. Varsayılan değer `10000`.
+`--limit`: `status --limit` için kullanılacak run sayısı. Varsayılan değer `10000`.
 
 ```bash
 --limit 10000
 ```
 
-`--output-root`
-
-Çıktıların yazılacağı ana klasör. Varsayılan değer mevcut klasör.
+`--output-root`: Çıktıların yazılacağı ana klasör. Varsayılan değer mevcut klasör `./downloads`
 
 ```bash
---output-root ./downloads
+--output-root main/path/to/output
 ```
 
-`--client-id-col`, `--name-col`, `--checked-col`
-
-Excel kolonlarını değiştirmek için kullanılır. Kolon numaraları 1'den başlar.
+`--client-id-col`, `--name-col`, `--checked-col`: Excel kolonlarını değiştirmek için kullanılır. Kolon numaraları 1'den başlar.
 
 ```bash
 --client-id-col 1 --name-col 2 --checked-col 4
 ```
 
-`--dry-run`
 
-Status, sample ve file list adımlarını çalıştırır; TSV/XLSX dosyalarını oluşturur ama VCF indirmez.
+`--force`: Mevcut VCF dosyaları doğru boyutta görünse bile yeniden indirir.
 
-```bash
---dry-run
-```
 
-`--force`
+`--resume-from-latest-manifest`: Multi-client modda en son güncellenmiş `download_manifest.tsv` hangi kurumdaysa oradan devam eder. Daha önce bitmiş kurumları tekrar taramaz.
 
-Mevcut VCF dosyaları doğru boyutta görünse bile yeniden indirir.
 
-```bash
---force
-```
-
-`--force-metadata`
-
-Mevcut `sample_metadata.xlsx` dosyalarını yeniden oluşturur.
-
-```bash
---force-metadata
-```
-
-`--resume-from-latest-manifest`
-
-Multi-client modda en son güncellenmiş `download_manifest.tsv` hangi kurumdaysa oradan devam eder. Daha önce bitmiş kurumları tekrar taramaz.
-
-```bash
---resume-from-latest-manifest
-```
-
-`--resume-verify-last-runs`
-
-Resume sırasında aktif kurumun manifestindeki son kaç run'ın yeniden kontrol edileceğini belirler. Varsayılan değer `10`.
+`--resume-verify-last-runs`: Resume sırasında aktif kurumun manifestindeki son kaç run'ın yeniden kontrol edileceğini belirler. Varsayılan değer `10`.
 
 ```bash
 --resume-verify-last-runs 10
 ```
 
-`--no-resume`
+`--no-resume`: Manifest'e göre atlama yapmaz. Run'ları tekrar işler.
 
-Manifest'e göre atlama yapmaz. Run'ları tekrar işler.
 
-```bash
---no-resume
-```
-
-`--verbose`
-
-Her run için daha detaylı terminal çıktısı verir.
-
-```bash
---verbose
-```
-
-`--command-timeout`
-
-`login-iam`, `status`, `sample`, `file --list` komutları için timeout süresi. Varsayılan değer `300` saniye.
+`--command-timeout`: `login-iam`, `status`, `sample`, `file --list` komutları için timeout süresi. Varsayılan değer `300` saniye.
 
 ```bash
 --command-timeout 300
 ```
 
-`--download-timeout`
-
-Tek bir VCF download komutu için toplam timeout süresi. Varsayılan değer `2700` saniye.
+`--download-timeout`: Tek bir VCF download komutu için toplam timeout süresi. Varsayılan değer `2700` saniye.
 
 ```bash
 --download-timeout 2700
 ```
 
-`--download-start-timeout`
-
-Download başladıktan sonra `.vcf.part` dosyası bu süre içinde oluşmazsa download başarısız kabul edilir. Varsayılan değer `180` saniye.
+`--download-start-timeout`: Download başladıktan sonra `.vcf.part` dosyası bu süre içinde oluşmazsa download başarısız kabul edilir. Varsayılan değer `180` saniye.
 
 ```bash
 --download-start-timeout 180
 ```
 
-`--download-stall-timeout`
-
-`.vcf.part` dosyasının boyutu bu süre boyunca artmazsa download takılmış kabul edilir. Varsayılan değer `300` saniye.
+`--download-stall-timeout`: `.vcf.part` dosyasının boyutu bu süre boyunca artmazsa download takılmış kabul edilir. Varsayılan değer `300` saniye.
 
 ```bash
 --download-stall-timeout 300
@@ -377,16 +317,9 @@ Download başladıktan sonra `.vcf.part` dosyası bu süre içinde oluşmazsa do
 `--wrapper`: SOPHiA wrapper dosyasının yolu. Varsayılan değer `./sg-upload-v2-wrapper.py`.
 
 ```bash
---wrapper ./sg-upload-v2-wrapper.py
+--wrapper path/to/sg-upload-v2-wrapper.py
 ```
 
-`--python`
-
-Wrapper'ı çalıştırmak için kullanılacak Python komutu. Varsayılan değer `python3`.
-
-```bash
---python python3
-```
 
 ## Resume Yaklaşımı
 

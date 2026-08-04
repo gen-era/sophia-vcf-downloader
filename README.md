@@ -374,9 +374,7 @@ Download başladıktan sonra `.vcf.part` dosyası bu süre içinde oluşmazsa do
 --download-stall-timeout 300
 ```
 
-`--wrapper`
-
-SOPHiA wrapper dosyasının yolu. Varsayılan değer `./sg-upload-v2-wrapper.py`.
+`--wrapper`: SOPHiA wrapper dosyasının yolu. Varsayılan değer `./sg-upload-v2-wrapper.py`.
 
 ```bash
 --wrapper ./sg-upload-v2-wrapper.py

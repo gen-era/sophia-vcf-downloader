@@ -74,13 +74,7 @@ Single-client çıktı yapısı:
         `-- sample_metadata.xlsx
 ```
 
-Kurum adları ve `userRef` değerleri dosya sistemi için güvenli hale getirilir. Türkçe karakterler ASCII karşılıklarına çevrilir.
 
-Örnek:
-
-```text
-İstanbul Üniversitesi -> Istanbul Universitesi
-```
 
 ## Oluşan Dosyalar
 

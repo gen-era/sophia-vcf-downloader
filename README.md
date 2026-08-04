@@ -216,6 +216,36 @@ Ek bir pip paketi gerekmez. Script Excel okuma/yazma işlemlerini Python standar
 
 ## Çalıştırma
 
+Genel kullanım örneği:
+
+```bash 
+cd /path/to/output/folder
+
+python3 /path/to/python/file/sophia_vcf_downloader.py \
+  --accounts-xlsx /path/to/accounts/file/sophia_accounts.xlsx \
+  --workers 4 \
+  --download-timeout 900 \
+  --download-start-timeout 180 \
+  --download-stall-timeout 300
+
+  ```
+
+Kesilen bir işleme devam etmek için:
+
+```bash
+cd /path/to/output/folder
+
+python3 /path/to/python/file/sophia_vcf_downloader.py \
+  --accounts-xlsx /path/to/accounts/file/sophia_accounts.xlsx \
+  --workers 4 \
+  --resume-from-latest-manifest \
+  --resume-verify-last-runs 10 \
+  --download-timeout 900 \
+  --download-start-timeout 180 \
+  --download-stall-timeout 300
+
+```
+
 Script ve SOPHiA wrapper aynı klasördeyse:
 
 ```bash
@@ -228,11 +258,6 @@ Worker sayısını belirlemek için:
 python3 download_sophia_vcfss.py --accounts-xlsx ./sophia_accounts.xlsx --workers 4
 ```
 
-Küçük test çalışması için:
-
-```bash
-python3 download_sophia_vcfss.py --accounts-xlsx ./sophia_accounts.xlsx --max-accounts 2 --limit 5 --dry-run
-```
 
 Single-client çalıştırmak için:
 

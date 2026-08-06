@@ -327,6 +327,5 @@ Script terminalde hesap ve run ilerlemesini gösterir.
 [4/140] Example Hospital (client-id 12345): done downloaded=20, skipped_exists=15
 ```
 
-Daha detaylı çıktı için:
 
 

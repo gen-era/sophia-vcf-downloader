@@ -120,37 +120,11 @@ Seçilen VCF dosyasını indirmek için kullanılır.
 
 ## VCF Seçimi ve İsimlendirme
 
-Script sadece şu dosyaları indirir:
+Script, run içindeki dosyalar arasından sadece `full_variant_table.vcf` dosyalarını indirir. Seçim yaparken önce `filename` alanına bakar; bu alan `full_variant_table.vcf` değilse fallback olarak `name` alanını kontrol eder.
 
-```text
-full_variant_table.vcf
-```
+İndirilen dosyalar `userRef` bilgisiyle adlandırılır: `<userRef>_full_variant_table.vcf`. Böylece VCF dosyasının hangi sample'a ait olduğu dosya adından anlaşılır.
 
-Dosya seçimi şu alanlara bakılarak yapılır:
-
-```text
-filename == "full_variant_table.vcf"
-```
-
-veya fallback olarak:
-
-```text
-name == "full_variant_table.vcf"
-```
-
-İndirilen VCF adı şu formatta olur:
-
-```text
-<userRef>_full_variant_table.vcf
-```
-
-Eğer `userRef` yoksa dosya kaybolmasın diye şu format kullanılır:
-
-```text
-unknown_<RUN_ID>_full_variant_table.vcf
-```
-
-Aynı run içinde aynı isim çakışırsa dosya adına `analysisId` veya `fileId` eklenir.
+Eğer ilgili kayıtta `userRef` yoksa dosya kaybolmasın diye `unknown_<RUN_ID>_full_variant_table.vcf` adı kullanılır. Aynı run içinde aynı dosya adı birden fazla kez oluşursa, çakışmayı önlemek için dosya adına `analysisId` veya `fileId` eklenir.
 
 ## Requirements
 

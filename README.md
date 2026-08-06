@@ -86,8 +86,6 @@ Single-client çıktı yapısı:
 
 ## Kullanılan SOPHiA CLI Komutları
 
-## Kullanılan SOPHiA CLI Komutları
-
 Script, arka planda şu SOPHiA wrapper komutlarını çalıştırır:
 
 ```bash

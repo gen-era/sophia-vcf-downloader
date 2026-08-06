@@ -75,58 +75,16 @@ Single-client çıktı yapısı:
 ```
 
 
-
 ## Oluşan Dosyalar
 
-`run_ids.tsv`
+| Dosya adı | Açıklama | Kolonlar |
+|---|---|---|
+| `run_ids.tsv` | Her kurum için alınan run listesini tutar. | `run_id`, `status` |
+| `download_manifest.tsv` | Her kurum için run ve download durumunu tutar. | `run_id`, `file_id`, `userRef`, `analysisId`, `output_path`, `status`, `metadata_status`, `metadata_path`, `metadata_error`, `error` |
+| `sample_metadata.xlsx` | Her run klasöründe oluşur. `Date`, `processDate` değerinin `DD-MM-YYYY` formatına çevrilmiş halidir. | `userRef`, `analysisType`, `genePanel`, `processDate`, `Date` |
+| `accounts_manifest.tsv` | Multi-client çalışmada hesap bazlı genel sonucu tutar. | `client_id`, `institution_name`, `account_status`, `run_count`, `processed_run_count`, `downloaded_count`, `metadata_written_count`, `error` |
 
-Her kurum için alınan run listesini tutar.
-
-Kolonlar:
-
-```text
-run_id
-status
-```
-
-`download_manifest.tsv`
-
-Her kurum için run ve download durumunu tutar.
-
-Kolonlar:
-
-```text
-run_id
-file_id
-userRef
-analysisId
-output_path
-status
-metadata_status
-metadata_path
-metadata_error
-error
-```
-
-`sample_metadata.xlsx`
-
-Her run klasöründe oluşur.
-
-Kolonlar:
-
-```text
-userRef
-analysisType
-genePanel
-processDate
-Date
-```
-
-`Date`, `processDate` değerinin `DD-MM-YYYY` formatına çevrilmiş halidir.
-
-`accounts_manifest.tsv`
-
-Multi-client çalışmada hesap bazlı genel sonucu tutar.
+## Kullanılan SOPHiA CLI Komutları
 
 ## Kullanılan SOPHiA CLI Komutları
 

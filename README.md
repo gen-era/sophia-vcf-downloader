@@ -86,13 +86,11 @@ Single-client çıktı yapısı:
 
 ## Kullanılan SOPHiA CLI Komutları
 
-Script, arka planda şu SOPHiA wrapper komutlarını çalıştırır:
-
 ```bash
 python3 sg-upload-v2-wrapper.py login-iam --client-id <CLIENT_ID>
 ```
 
-Multi-client modda her hesap için aktif hesaba giriş yapmak için kullanılır.
+Multi-client modda her hesap için aktif hesaba giriş yapar.
 
 ```bash
 python3 sg-upload-v2-wrapper.py status --limit <N>
